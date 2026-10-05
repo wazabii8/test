@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:PT="http://www.pubtrans.com/PT/1.0" xmlns:RII="http://www.pubtrans.com/RII/2.0" targetNamespace="http://www.pubtrans.com/RII/2.0" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="2.0.8">
+	<xs:annotation>
+		<xs:documentation>
+		This document is a property of NOPTIS. The definition of the interface specification defined in this document is a property of NOPTIS.
+		
+		Copyright © NOPTIS 2006-2012.
+		Final and approved versions of the document may be reproduced or used for the purpose of integrating systems according to the NOPTIS standard.
+		By using this document and the solutions designed herein, the user confirms that the material is not being used in a derogatory manner or in a misleading context.
+		The source of the material must be acknowledged and the title of the content must be included when being reproduced as part of another publication or service.
+				 
+		In order to avoid uncertainties for possible users of the standardised interface NOPTIS it is noted that Hogia Public Transport Systems AB,
+		as the owner of the registered trademark PUBTRANS, gives any user of the NOPTIS interface the right to use the names ToPubTrans, FromPubTrans,
+		ToPubTransMessages, FromPubTransMessages and www.pubtrans.com when – and to the extent - this is required to enable the user to technically interact through the NOPTIS interface.
+		The right of use is limited to the aforesaid and is applicable regardless of whether or not the interaction involves a Hogia product or not.
+		
+			Version 2.0.0 - Baseline version
+			Version 2.0.1
+			- Added additional Response messages
+			Version 2.0.2
+			-New namespace
+			Version 2.0.3 - 2.0.7
+			-Restructured schema. No actual change for users of schema.
+			Version 2.0.8
+			ControlActionUpdateResponse added.
+		</xs:documentation>
+	</xs:annotation>
+	<xs:import namespace="http://www.pubtrans.com/PT/1.0" schemaLocation=".\PTShared\PT-SharedTypes.xsd"/>
+	<!--== Uses XMLStream based trasport mechanism == -->
+	<xs:import namespace="http://www.pubtrans.com/PT/1.0" schemaLocation=".\PTShared\PT-XMLStream.xsd"/>
+	<!--======================================================================================== -->
+	<xs:include schemaLocation="RII-SharedTypes.xsd"/>
+	<xs:element name="FromPubTransMessages" type="RII:FromPubTransMessages"/>
+	<!--======================================================================================== -->
+	<xs:complexType name="FromPubTransMessages">
+		<xs:complexContent>
+			<xs:extension base="PT:Messages">
+				<xs:choice maxOccurs="unbounded">
+					<xs:group ref="PT:SystemMessages"/>
+					<xs:group ref="RII:Responses"/>
+				</xs:choice>
+				<xs:attribute name="DocumentLayoutVersion" type="RII:DocumentLayoutVersion" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:group name="Responses">
+		<xs:choice>
+			<xs:element name="DeviationCaseAddResponse" type="RII:DeviationCaseAddResponse"/>
+			<xs:element name="DeviationCaseReplaceResponse" type="RII:DeviationCaseReplaceResponse"/>
+			<xs:element name="ControlActionUpdateResponse" type="RII:ControlActionUpdateResponse"/>
+			<xs:element name="ControlActionRevokeResponse" type="RII:ControlActionRevokeResponse"/>
+			<xs:element name="DeviationCaseGroupResponse" type="RII:DeviationCaseGroupResponse"/>
+			<xs:element name="DeviationCaseUnGroupResponse" type="RII:DeviationCaseUnGroupResponse"/>
+			<xs:element name="DeviationMessageUpdateResponse" type="RII:DeviationMessageUpdateResponse"/>
+			<xs:element name="PublicationDecisionUpdateResponse" type="RII:PublicationDecisionUpdateResponse"/>
+		</xs:choice>
+	</xs:group>
+	<!--  *********************************************************  -->
+	<xs:complexType name="ControlActionRevokeResponse">
+		<xs:complexContent>
+			<xs:extension base="PT:Response"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationCaseGroupResponse">
+		<xs:complexContent>
+			<xs:extension base="PT:Response"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationCaseUnGroupResponse">
+		<xs:complexContent>
+			<xs:extension base="PT:Response"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="PublicationDecisionUpdateResponse">
+		<xs:complexContent>
+			<xs:extension base="PT:Response"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationCaseAddResponse">
+		<xs:annotation>
+			<xs:documentation>This is an acknowledgement of an DeviationCaseAddRequest. Resulting DeviationCaseGid will be returned correctly filled out in this message. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="PT:Response">
+				<xs:attribute name="DeviationCaseGid" type="PT:DeviationCaseGid" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationCaseReplaceResponse">
+		<xs:annotation>
+			<xs:documentation>This is an acknowledgement of an DeviationCaseReplaceRequest. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="PT:Response"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="ControlActionUpdateResponse">
+		<xs:annotation>
+			<xs:documentation>This is an acknowledgement of an ControlActionUpdateRequest. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="PT:Response"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationMessageUpdateResponse">
+		<xs:annotation>
+			<xs:documentation>This is an acknowledgement of an DeviationMessageUpdateRequest. Resulting VersionNumber will be returned correctly filled out in this message. </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="PT:Response">
+				<xs:attribute name="DeviationCaseGid" type="PT:DeviationCaseGid" use="required"/>
+				<xs:attribute name="VersionNumber" type="xs:integer" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:simpleType name="DocumentLayoutVersion">
+		<xs:annotation>
+			<xs:documentation>The set of values in the enumeration indicates the range of schema versions that this schema version is backward compatible with. Used to ensure that the schema version that an incoming document was validated against is not in conflict with this schema version.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="2.0.8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--  *********************************************************  -->
+</xs:schema>

@@ -1,0 +1,17 @@
+._*
+.DS_Store
+.sass-cache
+.idea
+.env
+.smbdelete*
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+node_modules
+dist
+*.local
+~$*
