@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:RII="http://www.pubtrans.com/RII/2.0" xmlns:PT="http://www.pubtrans.com/PT/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.pubtrans.com/RII/2.0" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="2.0.11">
+	<xs:annotation>
+		<xs:documentation>A set of RII messages sent in one batch</xs:documentation>
+		<xs:documentation>
+        This document is a property of NOPTIS. The definition of the interface specification defined in this document is a property of NOPTIS.
+		
+		Copyright © NOPTIS 2006-2012.
+		Final and approved versions of the document may be reproduced or used for the purpose of integrating systems according to the NOPTIS standard.
+		By using this document and the solutions designed herein, the user confirms that the material is not being used in a derogatory manner or in a misleading context.
+		The source of the material must be acknowledged and the title of the content must be included when being reproduced as part of another publication or service.
+				 
+		In order to avoid uncertainties for possible users of the standardised interface NOPTIS it is noted that Hogia Public Transport Systems AB,
+		as the owner of the registered trademark PUBTRANS, gives any user of the NOPTIS interface the right to use the names ToPubTrans, FromPubTrans,
+		ToPubTransMessages, FromPubTransMessages and www.pubtrans.com when – and to the extent - this is required to enable the user to technically interact through the NOPTIS interface.
+		The right of use is limited to the aforesaid and is applicable regardless of whether or not the interaction involves a Hogia product or not.
+		
+		Version 2.0.0: Baseline version
+		Version 2.0.1:
+		-  Renamed complex types
+		Version 2.0.2: 
+		- Intermediate release
+		Version 2.0.3
+		- Added attribute IsPublic in MessageVariant.
+		- Type NamedJourneyPatternRef replaces JourneyPatternRef.
+		- IsApproved is required attribute in PublicationDecision.
+		- ProgressState is required attribute in ChangeOfJourneyProgress.
+		- Status is required attribute in NetworkControlAction.
+		- Scope is renamed PublicationScope in PublicationDecision.
+		- MaxWaitTimeDuration renamed MaxWaitForFeederDuration.
+		- MinChangeTimeDuration renamed MinChangeDuration.
+		- InformStaff renamed IsExposedToStaff.
+		- InformPassengers renamed IsExposedToPassengers.
+		- StopPointAllocation added.
+		- Gid extended in DatedVehicleJourneyRef. It is acceptable to provide the DOI Id of the VehicleJourney instead of Gid in the DatedVehicleJourneyRef element.
+		- Complex type ControlAction and related types moved to included schema RII-ControlAction.xsd.
+		Version 2.0.4
+		- Backward compatible changes in included RII-ControlAction xsd.
+		Version 2.0.5
+		-Changes in included ControlAction.xsd
+		Version 2.0.6
+ 		-Changes in included ControlAction.xsd and PT-SharedTypes.xsd
+		-TargetNamespace changed
+		-Attribute UsageType is of type xs:token also in HEADER and SUMMARY
+		Version 2.0.7
+		-DeviationCaseDefineRequest must include either a ControlAction or an InformationAction
+		-Restructured schema. No actual change for users of schema.
+		-DeviationMessage element is required in DeviationMessageUpdateRequest
+		-DeviationMessageVersionRef in DeviationMessageUpdateRequest replaced by DeviationCaseRef
+		-StopScope group moved from Control Action and extended with Transport Authority
+		-PublicationScope in DeviationMessage reworked
+		-PublicationDecision is not optional in a PublicationDecisionUpdateRequest
+		Version 2.0.8
+		-Attribute Content in MessageVariantSkeleton is of type Content which has a length restriction
+		.Attribute UsageType is of Type PT:ShortName
+		-Attribute ReminderHyperlink is of type RII:HyperLinkName
+		-Attribute CustomCategory is of type PT:Name
+		-Annotation added in complexTypes LinePublicationScopes and DetailedPublicationScopes
+    	-Annotation added in complex type MessageVariants
+   		-Optional attribute IsRestrictedToDeviationScope added to complex type DetailedPublicationScope
+   		-Annotaion for complex types StopScope, ScopeElement and  PublicationStopScopes adjusted
+   		-Complex types DeviationCaseReplaceRequest, DeviationCaseAddRequest and DeviationCaseDefineRequest adjusted because DeviationCaseReplaceRequest can not be used for control actions.
+   		-Attribute PublicNote in DeviationMessage is required.
+   		Version 2.0.9
+   		-Accept Organisational Unit Id  (Department responsible for a specific journey) as Vehicle Operator Ref in Journey Cancellation. If such an Id is entered only journeys managed by that org unit will be cancelled. 
+   		Version 2.0.10
+   		-New element ControlActionUpdateRequest added. It provides support for updating control action end of time scope and reason.
+   		Version 2.0.11
+   		-PublicationScope extended
+   		
+		</xs:documentation>
+	</xs:annotation>
+	<xs:import namespace="http://www.pubtrans.com/PT/1.0" schemaLocation=".\PTShared\PT-SharedTypes.xsd"/>
+	<!--== Uses XMLStream based trasport mechanism == -->
+	<xs:import namespace="http://www.pubtrans.com/PT/1.0" schemaLocation=".\PTShared\PT-XMLStream.xsd"/>
+	<!--======================================================================================== -->
+	<xs:include schemaLocation="RII-SharedTypes.xsd"/>
+	<xs:include schemaLocation="RII-ControlAction.xsd"/>
+	<xs:element name="ToPubTransMessages" type="RII:ToPubTransMessages"/>
+	<!--======================================================================================== -->
+	<xs:complexType name="ToPubTransMessages">
+		<xs:complexContent>
+			<xs:extension base="PT:Messages">
+				<xs:annotation>
+					<xs:documentation>A set of RII messages sent in one batch</xs:documentation>
+				</xs:annotation>
+				<xs:choice maxOccurs="unbounded">
+					<xs:group ref="PT:SystemMessages"/>
+					<xs:group ref="RII:Requests"/>
+				</xs:choice>
+				<xs:attribute name="DocumentLayoutVersion" type="RII:DocumentLayoutVersion" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:group name="Requests">
+		<xs:choice>
+			<xs:element name="DeviationCaseAddRequest" type="RII:DeviationCaseAddRequest"/>
+			<xs:element name="DeviationCaseReplaceRequest" type="RII:DeviationCaseReplaceRequest"/>
+			<xs:element name="ControlActionUpdateRequest" type="RII:ControlActionUpdateRequest">
+				<xs:annotation>
+					<xs:documentation>Only certain Control Actions can be updated.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ControlActionRevokeRequest" type="RII:ControlActionRevokeRequest">
+				<xs:annotation>
+					<xs:documentation>Only certain Control Actions can be revoked. Revoking will typically only shorten the time scope of a Control Action.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DeviationCaseGroupRequest" type="RII:DeviationCaseGroupRequest"/>
+			<xs:element name="DeviationCaseUnGroupRequest" type="RII:DeviationCaseUnGroupRequest"/>
+			<xs:element name="DeviationMessageUpdateRequest" type="RII:DeviationMessageUpdateRequest"/>
+			<xs:element name="PublicationDecisionUpdateRequest" type="RII:PublicationDecisionUpdateRequest"/>
+		</xs:choice>
+	</xs:group>
+	<!--  *********************************************************  -->
+	<xs:complexType name="LinePublicationScope">
+		<xs:sequence>
+			<xs:choice>
+				<xs:element name="LineRef" type="PT:LineRef"/>
+				<xs:element name="DirectionOfLineRef" type="PT:DirectionOfLineRef"/>
+			</xs:choice>
+			<xs:element name="PublicationDecision" type="RII:PublicationDecision"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="LinePublicationScopes">
+		<xs:sequence>
+			<xs:element name="PublicationScope" type="RII:LinePublicationScope" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>It is not permitted to provide two PublicationsScopes having the same LineRef or DirectionOfLineRef. It is not permitted to provide PublicationsScopes for DirectionOfLineRef on a certain Line if a PublicationScope for LineRef is also provided for the same Line.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="PublicationDecisionUpdateRequest">
+		<xs:complexContent>
+			<xs:extension base="PT:Request">
+				<xs:sequence>
+					<xs:element name="DeviationMessageVersionRef" type="RII:DeviationMessageVersionRef"/>
+					<xs:element name="PublicationScopes" type="RII:LinePublicationScopes"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationCaseGroupRequest">
+		<xs:complexContent>
+			<xs:extension base="PT:Request">
+				<xs:sequence>
+					<xs:element name="CaseRef" type="RII:CaseRef"/>
+					<xs:element name="MasterCaseRef" type="RII:CaseRef"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationCaseUnGroupRequest">
+		<xs:complexContent>
+			<xs:extension base="PT:Request">
+				<xs:sequence>
+					<xs:element name="CaseRef" type="RII:CaseRef"/>
+					<xs:element name="MasterCaseRef" type="RII:CaseRef"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationMessageUpdateRequest">
+		<xs:complexContent>
+			<xs:extension base="PT:Request">
+				<xs:sequence>
+					<xs:element name="DeviationCaseRef" type="RII:CaseRef"/>
+					<xs:element name="DeviationMessage" type="RII:DeviationMessage"/>
+					<xs:element name="ReportedByUser" type="RII:User" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationCaseReplaceRequest">
+		<xs:complexContent>
+			<xs:restriction base="RII:DeviationCaseDefineRequest">
+				<xs:sequence>
+					<xs:element name="MasterCaseRef" type="RII:CaseRef" minOccurs="0"/>
+					<xs:element name="DeviationReason" type="RII:DeviationReason" minOccurs="0"/>
+					<xs:element name="InformationAction" type="RII:InformationAction"/>
+					<xs:element name="DeviationMessage" type="RII:DeviationMessage" minOccurs="0"/>
+					<xs:element name="ReportedByUser" type="RII:User" minOccurs="0"/>
+					<xs:element name="ExternalCaseRef" type="RII:ExternalCaseRef" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This is an (optional) alternate reference to the deviation case used in an external system.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ReplacedCaseRef" type="RII:CaseRef"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationCaseAddRequest">
+		<xs:complexContent>
+			<xs:restriction base="RII:DeviationCaseDefineRequest">
+				<xs:sequence>
+					<xs:element name="MasterCaseRef" type="RII:CaseRef" minOccurs="0"/>
+					<xs:element name="DeviationReason" type="RII:DeviationReason" minOccurs="0"/>
+					<xs:choice>
+						<xs:element name="ControlAction" type="RII:ControlAction"/>
+						<xs:element name="InformationAction" type="RII:InformationAction"/>
+					</xs:choice>
+					<xs:element name="DeviationMessage" type="RII:DeviationMessage" minOccurs="0"/>
+					<xs:element name="ReportedByUser" type="RII:User" minOccurs="0"/>
+					<xs:element name="ExternalCaseRef" type="RII:ExternalCaseRef" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This is an (optional) alternate reference to the deviation case used in an external system.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationCaseDefineRequest">
+		<xs:complexContent>
+			<xs:extension base="PT:Request">
+				<xs:sequence>
+					<xs:element name="MasterCaseRef" type="RII:CaseRef" minOccurs="0"/>
+					<xs:element name="DeviationReason" type="RII:DeviationReason" minOccurs="0"/>
+					<xs:choice>
+						<xs:element name="ControlAction" type="RII:ControlAction"/>
+						<xs:element name="InformationAction" type="RII:InformationAction"/>
+					</xs:choice>
+					<xs:element name="DeviationMessage" type="RII:DeviationMessage" minOccurs="0"/>
+					<xs:element name="ReportedByUser" type="RII:User" minOccurs="0"/>
+					<xs:element name="ExternalCaseRef" type="RII:ExternalCaseRef" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This is an (optional) alternate reference to the deviation case used in an external system.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ReplacedCaseRef" type="RII:CaseRef" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="ControlActionRevokeRequest">
+		<xs:complexContent>
+			<xs:extension base="PT:Request">
+				<xs:sequence>
+					<xs:element name="CaseRef" type="RII:CaseRef"/>
+					<xs:element name="RevokedByUser" type="RII:User" minOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute name="RevokeFromDateTime" type="xs:dateTime" use="optional"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="ControlActionUpdateRequest">
+		<xs:complexContent>
+			<xs:extension base="PT:Request">
+				<xs:sequence>
+					<xs:element name="CaseRef" type="RII:CaseRef"/>
+					<xs:element name="DeviationReason" type="RII:DeviationReason" minOccurs="0"/>
+					<xs:element name="TimeScope" type="RII:UpdateTimeScope" minOccurs="0"/>
+					<xs:element name="ReportedByUser" type="RII:User" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="InformationAction">
+		<xs:sequence>
+			<xs:element name="ScopeElements" type="RII:ScopeElements"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationMessage">
+		<xs:sequence>
+			<xs:element name="PublicationScopes" type="RII:DetailedPublicationScopes"/>
+			<xs:element name="TargetAudience" type="RII:TargetAudience"/>
+			<xs:element name="Reminder" type="RII:Reminder" minOccurs="0"/>
+			<xs:element name="Priority" type="RII:Priority"/>
+			<xs:element name="MessageVariants" type="RII:MessageVariants">
+				<xs:annotation>
+					<xs:documentation>At least one message variant must be provided.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="PublishFromDateTime" type="xs:dateTime" use="required"/>
+		<xs:attribute name="PublishUptoDateTime" type="xs:dateTime" use="optional"/>
+		<xs:attribute name="RequiresPublicationApproval" type="PT:YesNo" use="optional" default="N"/>
+		<xs:attribute name="PublicNote" type="PT:Note" use="required"/>
+		<xs:attribute name="InternalNote" type="PT:Note" use="optional"/>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="MessageVariants">
+		<xs:sequence>
+			<xs:element name="Header" type="RII:Header" minOccurs="0"/>
+			<xs:element name="Summary" type="RII:Summary" minOccurs="0"/>
+			<xs:element name="Details" type="RII:Details" minOccurs="0"/>
+			<xs:element name="ShortTextMessage" type="RII:ShortTextMessage" minOccurs="0"/>
+			<xs:element name="ShortVoiceMessage" type="RII:ShortVoiceMessage" minOccurs="0"/>
+			<xs:element name="MessageVariant" type="RII:MessageVariant" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:group name="StopScope">
+		<xs:choice>
+			<xs:element name="StopTransportAuthorityRef" type="PT:TransportAuthorityRef"/>
+			<xs:element name="StopAreaRef" type="PT:StopAreaRef"/>
+			<xs:group ref="RII:JourneyPatternPointRefGroup"/>
+		</xs:choice>
+	</xs:group>
+	<!--  *********************************************************  -->
+	<xs:complexType name="ScopeElement">
+		<xs:sequence>
+			<xs:annotation>
+				<xs:documentation>If stop scope group is omitted then there is no restriction on stop scope, except if either arrivals or departures are excluded generally by setting ConcernsArrival='N' or ConcernsDeparture='N'</xs:documentation>
+			</xs:annotation>
+			<xs:group ref="RII:StopScope" minOccurs="0"/>
+			<xs:group ref="RII:SimplifiedJourneyScope" minOccurs="0"/>
+			<xs:element name="TimeScope" type="RII:TimeScope"/>
+		</xs:sequence>
+		<xs:attribute name="ConcernsArrivals" type="PT:YesNo" use="optional" default="Y"/>
+		<xs:attribute name="ConcernsDepartures" type="PT:YesNo" use="optional" default="Y"/>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="ScopeElements">
+		<xs:sequence>
+			<xs:element name="ScopeElement" type="RII:ScopeElement" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="UpdateTimeScope">
+		<xs:attribute name="UptoDateTime" type="xs:dateTime" use="required"/>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DeviationReason">
+		<xs:attribute name="StandardCategory" type="RII:DeviationReasonCategory" use="required"/>
+		<xs:attribute name="CustomCategory" type="PT:Name" use="optional"/>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="PublicationDecision">
+		<xs:sequence>
+			<xs:element name="DecidedByUser" type="RII:User"/>
+		</xs:sequence>
+		<xs:attribute name="IsApproved" type="PT:YesNo" use="required"/>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="PublicationStopScope">
+		<xs:group ref="RII:StopScope" minOccurs="0"/>
+		<xs:attribute name="ConcernsArrivals" type="PT:YesNo" use="optional" default="Y"/>
+		<xs:attribute name="ConcernsDepartures" type="PT:YesNo" use="optional" default="Y"/>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="PublicationStopScopes">
+		<xs:sequence>
+			<xs:element name="StopScope" type="RII:PublicationStopScope" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>If the stop scope group is omitted then either ConcernsArrival or ConcernsDeparture must be set to 'N'</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DetailedPublicationScope">
+		<xs:sequence>
+			<xs:element name="StopScopes" type="RII:PublicationStopScopes" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>If this element is omitted, then then there is no restriction on stop scope.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice>
+				<xs:element name="LineRef" type="PT:LineRef"/>
+				<xs:element name="DirectionOfLineRef" type="PT:DirectionOfLineRef"/>
+			</xs:choice>
+			<xs:element name="PublicationDecision" type="RII:PublicationDecision" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="IsRestrictedToDeviationScope" type="PT:YesNo" use="optional">
+			<xs:annotation>
+				<xs:documentation>If this attribute is omitted, then it will be interpreted as being set to No for message versions attached to information action deviation cases, and being set to Yes for message versions attached to control action deviation cases.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="DetailedPublicationScopes">
+		<xs:sequence>
+			<xs:element name="PublicationScope" type="RII:DetailedPublicationScope" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>It is not permitted to provide two PublicationsScopes having the same LineRef or DirectionOfLineRef. It is not permitted to provide PublicationsScopes for DirectionOfLineRef on a certain Line if a PublicationScope for LineRef is also provided for the same Line.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="TargetAudience">
+		<xs:sequence>
+			<xs:element name="Passenger" minOccurs="0"/>
+			<xs:element name="Customer" minOccurs="0"/>
+			<xs:element name="OnboardStaff" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="Reminder">
+		<xs:attribute name="RemindOnDateTime" type="xs:dateTime" use="required"/>
+		<xs:attribute name="ReminderHyperlink" type="RII:HyperLinkName" use="required">
+			<xs:annotation>
+				<xs:documentation>Could be mailaddress in the form of mailto:kim.hallmark@buses.se</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="Priority">
+		<xs:attribute name="ImportanceLevel" type="RII:PriorityLevel" use="required"/>
+		<xs:attribute name="InfluenceLevel" type="RII:PriorityLevel" use="required"/>
+		<xs:attribute name="UrgencyLevel" type="RII:PriorityLevel" use="required"/>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="Header">
+		<xs:complexContent>
+			<xs:extension base="RII:MessageVariantSkeleton">
+				<xs:attribute name="UsageType" type="PT:ShortName" use="required" fixed="HEADER"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="Summary">
+		<xs:complexContent>
+			<xs:extension base="RII:MessageVariantSkeleton">
+				<xs:attribute name="UsageType" type="PT:ShortName" use="required" fixed="SUMMARY"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="Details">
+		<xs:complexContent>
+			<xs:extension base="RII:MessageVariantSkeleton">
+				<xs:attribute name="UsageType" type="PT:ShortName" use="required" fixed="DETAILS"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="ShortTextMessage">
+		<xs:complexContent>
+			<xs:extension base="RII:MessageVariantSkeleton">
+				<xs:attribute name="UsageType" type="PT:ShortName" use="required" fixed="SHORTTEXT"/>
+				<xs:attribute name="IsPublic" type="PT:YesNo" use="optional" default="N"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="ShortVoiceMessage">
+		<xs:complexContent>
+			<xs:extension base="RII:MessageVariantSkeleton">
+				<xs:attribute name="UsageType" type="PT:ShortName" use="required" fixed="SHORTVOICE"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="MessageVariant">
+		<xs:complexContent>
+			<xs:extension base="RII:MessageVariantSkeleton">
+				<xs:attribute name="UsageType" type="PT:ShortName" use="required"/>
+				<xs:attribute name="IsPublic" type="PT:YesNo" use="optional" default="N"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:complexType name="MessageVariantSkeleton">
+		<xs:attribute name="ContentType" type="RII:ContentType" use="required"/>
+		<xs:attribute name="Content" type="RII:Content" use="required"/>
+		<xs:attribute name="Language" type="xs:language" use="optional"/>
+	</xs:complexType>
+	<!--  *********************************************************  -->
+	<xs:simpleType name="DocumentLayoutVersion">
+		<xs:annotation>
+			<xs:documentation>The set of values in the enumeration indicates the range of schema versions that this schema version is backward compatible with. Used to ensure that the schema version that an incoming document was validated against is not in conflict with this schema version.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:token">
+			<xs:enumeration value="2.0.11"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
